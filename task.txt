@@ -1,0 +1,39 @@
+Proszę zaimplementować w języku C mapę przestrzeni adresowej procesu wykorzystującą drzewa czerwono-czarne.
+Mapa pamięci to struktura danych przechowująca opis przestrzeni adresowej procesu, czyli zakresy adresów,
+które są wykorzystywane przez proces i są przypisane do obiektów pamięci.
+Przykładowe elementy mapy to segment kodu procesu, segment danych, segment danych nieinicjowanych (BSS), stos itp.
+Bardzo ważnym elementem mapy jest wyszukiwanie obszarów przestrzeni adresowej, w których można umieścić kolejny obiekt.
+
+
+Powinny zostać dostarczone funkcje:
+
+
+void *mymap_mmap(map_t *map, void *vaddr, unsigned int size, unsigned int flags, void *o);
+
+Wmapowanie obiektu o o rozmiarze size w przestrzeń adresową procesu pod adresem pamięci nie mniejszym niż vaddr.
+Zwracany jest faktyczny adres, pod który udało się wmapować obiekt.
+Argument flags oznacza atrybuty mapowania np. READ | WRITE | EXEC.
+
+
+void mymap_munmap(map_t *map, void *vaddr);
+
+Odmapowanie obiektu pamięci zamapowanego pod adresem vaddr.
+Adres vaddr może być każdym adresem z przedziału, w który zamapowany jest obiekt.
+
+
+int mymap_init(map_t *map);
+
+Zainicjowanie mapy.
+
+
+int mymap_dump(map_t *map);
+
+Wyświetlenie na konsoli struktury mapy.
+
+
+Uwagi:
+1. Nie można wykorzystywać już istniejących implementacji drzew czerwono-czarnych.
+2. Bardzo ważnym elementem implementacji jest wyszukiwanie wolnych fragmentów przestrzeni adresowej począwszy od zadanego adresu.
+3. Proszę zadbać o czytelność i optymalność kodu.
+4. Proszę zaimplementować to spokojnie i przeznaczyć na to tyle czasu ile jest wymagane.
+5. Proszę o dostarczenie programu testowego.
