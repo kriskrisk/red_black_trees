@@ -17,6 +17,7 @@ struct node {
     bool red;               // True if red
     Node *left;
     Node *right;
+    Node *parent;
     Memory_block *memory;   // Info about memory block taken by this node
 };
 

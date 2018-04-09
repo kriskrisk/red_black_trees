@@ -5,14 +5,16 @@
 */
 
 #include <stdlib.h>
+#include <assert.h>
 #include "rb_tree.h"
 
-Node* createNode(bool red, Memory_block *memory) {
+Node *createNode(Memory_block *memory) {
     Node *new_node = malloc(sizeof(Node));
-    new_node->red = red;
+    new_node->red = true;
     new_node->left = NULL;
     new_node->right = NULL;
     new_node->memory = memory;
+    new_node->parent = NULL;
 
     return new_node;
 }
@@ -25,21 +27,46 @@ bool isLess(Memory_block *block_to_allocate, Memory_block *block_in_memory) {
     return false;
 }
 
+//BST insertion for now
+void insert(Tree *tree, Memory_block *memory_to_allocate) {
+    Node *new_node = createNode(memory_to_allocate);
+    Node *curr_considered = tree->root;
+    Node *curr_upper_limit = NULL;
 
-
-// Assumption: node is not NULL
-Node* insert(Node *node, Memory_block *memory_to_allocate) {
-    if (isLess(memory_to_allocate, node->memory)) {
-        // wstawiamy po lewej
+    if (curr_considered == NULL) {
+        curr_considered = new_node;         // Any vaddr is ok
+        curr_considered->red = false;       // Root is always black
     } else {
-        //wstawiamy po prawej
+        while (1) {
+            if (isLess(memory_to_allocate, curr_considered->memory)) {
+                if (curr_considered->left == NULL) {
+                    curr_considered->left = new_node;
+                    break;
+                } else {
+                    curr_upper_limit = curr_considered;
+                    curr_considered = curr_considered->left;
+                }
+            } else {
+                if (curr_considered->right == NULL) {
+                    if (curr_upper_limit != NULL) {
+                        if (isLess(memory_to_allocate, curr_upper_limit->memory)) {
+                            curr_considered->right = new_node;
+                            break;
+                        } else {
+                            curr_considered = curr_upper_limit->right;
+                        }
+                    } else {
+                        curr_considered->right = new_node;
+                        break;
+                    }
+                } else {
+                    curr_considered = curr_considered->right;
+                }
+            }
+        }
+
+        new_node->parent = curr_considered;
+        // Rotations and switching colors
     }
 }
 
-Node* insertToTree(Tree *tree, Memory_block *memory_to_allocate) {
-    if (tree->root == NULL) {
-        tree->root = createNode(false, memory_to_allocate);
-    } else {
-        insert(tree->root, Memory_block *memory_to_allocate);
-    }
-}
