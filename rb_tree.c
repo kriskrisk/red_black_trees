@@ -105,7 +105,7 @@ void insert_case3(Node *node, map_t *map) {
 
 void insert_case2(Node *node, map_t *map) {
     if (node->parent->red) {
-        if (uncle(node)->red) {
+        if (uncle(node) != NULL && uncle(node)->red) {
             node->parent->red = false;
             uncle(node)->red = false;
             grandparent(node)->red = true;
