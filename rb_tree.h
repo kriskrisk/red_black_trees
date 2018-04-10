@@ -10,7 +10,7 @@
 #include <stdbool.h>
 
 typedef struct node Node;
-typedef struct tree Tree;
+typedef struct tree map_t;
 typedef struct memory_block Memory_block;
 
 struct node {
@@ -29,6 +29,10 @@ struct memory_block {
     void *vaddr;
     unsigned int size;
     unsigned int flags;
+    void *o;
 };
+
+int mymap_init(map_t *map);
+void *mymap_mmap(map_t *map, void *vaddr, unsigned int size, unsigned int flags, void *o);
 
 #endif //RED_BLACK_TREES_RB_TREE_H
