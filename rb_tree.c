@@ -1,8 +1,4 @@
-/** @file
-   Implementation of red black trees
-   @author Krzysztof Olejnik <krzysztofolejnik48@gmail.com>
-   @date 2018-04-08
-*/
+/* Implementation of red black trees */
 
 #include <stdlib.h>
 #include <assert.h>
@@ -255,38 +251,36 @@ static void delete(map_t *map, node_t *node) {
             }
         }
 
-        if (is_red(node->parent) == false &&  is_red(sibling(node)) == false &&
+        if (is_red(node->parent) == false && is_red(sibling(node)) == false &&
             is_red(sibling(node)->left) == false && is_red(sibling(node)->right) == false) {
             sibling(node)->red = true;
             delete(map, node->parent);
+        } else if (is_red(node->parent) == true && is_red(sibling(node)) == false &&
+                   is_red(sibling(node)->left) == false && is_red(sibling(node)->right) == false) {
+            sibling(node)->red = true;
+            node->parent->red = false;
         } else {
-            if (is_red(node->parent) == true &&  is_red(sibling(node)) == false &&
-                is_red(sibling(node)->left) == false && is_red(sibling(node)->right) == false) {
+            if (is_left_child(node) && is_red(sibling(node)) == false &&
+                is_red(sibling(node)->left) == true && is_red(sibling(node)->right) == false) {
                 sibling(node)->red = true;
-                node->parent->red = false;
+                sibling(node)->left->red = false;
+                rotate_right(sibling(node), map);
+            } else if (!is_left_child(node) && is_red(sibling(node)) == false &&
+                       is_red(sibling(node)->left) == false && is_red(sibling(node)->right) == true) {
+                sibling(node)->red = true;
+                sibling(node)->right->red = false;
+                rotate_left(sibling(node), map);
+            }
+
+            sibling(node)->red = is_red(node->parent);
+            node->parent->red = false;
+
+            if (is_left_child(node)) {
+                sibling(node)->right->red = false;
+                rotate_left(node->parent, map);
             } else {
-                if (is_left_child(node) &&  is_red(sibling(node)) == false &&
-                    is_red(sibling(node)->left) == true && is_red(sibling(node)->right) == false) {
-                    sibling(node)->red = true;
-                    sibling(node)->left->red = false;
-                    rotate_right(sibling(node), map);
-                } else if (!is_left_child(node) &&  is_red(sibling(node)) == false &&
-                         is_red(sibling(node)->left) == false && is_red(sibling(node)->right) == true) {
-                    sibling(node)->red = true;
-                    sibling(node)->right->red = false;
-                    rotate_left(sibling(node), map);
-                }
-
-                sibling(node)->red = is_red(node->parent);
-                node->parent->red = false;
-
-                if (is_left_child(node)) {
-                    sibling(node)->right->red = false;
-                    rotate_left(node->parent, map);
-                } else {
-                    sibling(node)->left->red = false;
-                    rotate_right(node->parent, map);
-                }
+                sibling(node)->left->red = false;
+                rotate_right(node->parent, map);
             }
         }
     }
@@ -309,7 +303,7 @@ void mymap_munmap(map_t *map, void *vaddr) {
     }
 
     // to_delete has at most one child
-    child = to_delete->right == NULL ? to_delete->left  : to_delete->right;
+    child = to_delete->right == NULL ? to_delete->left : to_delete->right;
     if (to_delete->red == false) {
         if (child == NULL) {
             to_delete->red = false;

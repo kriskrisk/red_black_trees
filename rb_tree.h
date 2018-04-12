@@ -1,8 +1,4 @@
-/** @file
-   Red Black Tree interface.
-   @author Krzysztof Olejnik <krzysztofolejnik48@gmail.com>
-   @date 2018-04-08
-*/
+/* Red Black Tree interface */
 
 #ifndef RED_BLACK_TREES_RB_TREE_H
 #define RED_BLACK_TREES_RB_TREE_H
