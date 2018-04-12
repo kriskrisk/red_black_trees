@@ -20,6 +20,8 @@ int main() {
     int object3 = 354;
     mymap_mmap(map, ptr2 + 1, 3, 5, &object3);
 
+    mymap_dump(map);
+
     mymap_munmap(map, ptr1);
     mymap_munmap(map, ptr2);
     mymap_munmap(map, ptr2 + 4);

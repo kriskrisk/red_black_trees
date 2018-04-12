@@ -2,11 +2,35 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include <stdio.h>
 #include "rb_tree.h"
 
 
 int mymap_init(map_t *map) {
     map->root = NULL;
+    return 0;
+}
+
+void print_subtree(node_t *node) {
+    if (node->left != NULL) {
+        print_subtree(node->left);
+    }
+
+    printf("[vaddr: %p, size: %u, flags: %u object: %p] ",
+           node->memory->vaddr, node->memory->size, node->memory->flags, node->memory->object);
+
+    if (node->right != NULL) {
+        print_subtree(node->right);
+    }
+}
+
+int mymap_dump(map_t *map) {
+    if (map->root == NULL) {
+        printf("Empty map!");
+    } else {
+        print_subtree(map->root);
+    }
+
     return 0;
 }
 

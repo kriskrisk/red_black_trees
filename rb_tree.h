@@ -31,5 +31,6 @@ struct memory_block {
 int mymap_init(map_t *map);
 void *mymap_mmap(map_t *map, void *vaddr, unsigned int size, unsigned int flags, void *object);
 void mymap_munmap(map_t *map, void *vaddr);
+int mymap_dump(map_t *map);
 
 #endif //RED_BLACK_TREES_RB_TREE_H
