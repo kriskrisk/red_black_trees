@@ -14,8 +14,8 @@ int mymap_init(map_t *map) {
     return 0;
 }
 
-Node *createNode(Memory_block *memory) {
-    Node *new_node = malloc(sizeof(Node));
+static node_t *createNode(memory_block *memory) {
+    node_t *new_node = malloc(sizeof(node_t));
     new_node->red = true;
     new_node->left = NULL;
     new_node->right = NULL;
@@ -25,24 +25,24 @@ Node *createNode(Memory_block *memory) {
     return new_node;
 }
 
-// I assume that node has gradparent
-Node *uncle(Node *node) {
-    if (node->parent->parent->right == node->parent) {
-        return node->parent->parent->left;
-    }
-
-    return node->parent->parent->right;
-}
-
-Node *grandparent(Node *node) {
-    return node->parent->parent;
-}
-
-bool isLeftChild(Node *node) {
+static bool isLeftChild(node_t *node) {
     return node == node->parent->left;
 }
 
-void rotate_left(Node *node, map_t *map) {
+// I assume that node_t has gradparent
+static node_t *uncle(node_t *node) {
+    if (isLeftChild(node->parent)) {
+        return node->parent->parent->right;
+    }
+
+    return node->parent->parent->left;
+}
+
+static node_t *grandparent(node_t *node) {
+    return node->parent->parent;
+}
+
+static void rotate_left(node_t *node, map_t *map) {
     if (node->parent == NULL) {
         map->root = node->right;
         node->right->parent = NULL;
@@ -55,12 +55,12 @@ void rotate_left(Node *node, map_t *map) {
     }
 
     node->parent = node->right;
-    Node *temp = node->right->left;
+    node_t *temp = node->right->left;
     node->right->left = node;
     node->right = temp;
 }
 
-void rotate_right(Node *node, map_t *map) {
+static void rotate_right(node_t *node, map_t *map) {
     if (node->parent == NULL) {
         map->root = node->left;
         node->left->parent = NULL;
@@ -73,14 +73,14 @@ void rotate_right(Node *node, map_t *map) {
     }
 
     node->parent = node->left;
-    Node *temp = node->left->right;
+    node_t *temp = node->left->right;
     node->left->right = node;
     node->left = temp;
 }
 
-void insert_case1(Node *node, map_t *map);
+static void insert_case1(node_t *node, map_t *map);
 
-void insert_case3(Node *node, map_t *map) {
+static void insert_case3(node_t *node, map_t *map) {
     if (isLeftChild(node) && isLeftChild(node->parent)) {
         rotate_right(grandparent(node), map);
         node->parent->red = false;
@@ -103,7 +103,7 @@ void insert_case3(Node *node, map_t *map) {
 
 }
 
-void insert_case2(Node *node, map_t *map) {
+static void insert_case2(node_t *node, map_t *map) {
     if (node->parent->red) {
         if (uncle(node) != NULL && uncle(node)->red) {
             node->parent->red = false;
@@ -117,17 +117,16 @@ void insert_case2(Node *node, map_t *map) {
     }
 }
 
-void insert_case1(Node *node, map_t *map) {
+static void insert_case1(node_t *node, map_t *map) {
     if (node->parent == NULL)
         node->red = false;
     else
         insert_case2(node, map);
 }
 
-// BST insertion for now
-void *insert(map_t *map, Memory_block *memory_to_allocate) {
-    Node *new_node = createNode(memory_to_allocate);
-    Node *curr_considered = map->root;
+static void *insert(map_t *map, memory_block *memory_to_allocate) {
+    node_t *new_node = createNode(memory_to_allocate);
+    node_t *curr_considered = map->root;
 
     if (curr_considered == NULL) {
         map->root = new_node;         // Any vaddr is OK
@@ -158,12 +157,12 @@ void *insert(map_t *map, Memory_block *memory_to_allocate) {
     return new_node->memory->vaddr;
 }
 
-void *mymap_mmap(map_t *map, void *vaddr, unsigned int size, unsigned int flags, void *o) {
-    Memory_block *memory_to_allocate = (Memory_block *) malloc(sizeof(Memory_block));
+void *mymap_mmap(map_t *map, void *vaddr, unsigned int size, unsigned int flags, void *object) {
+    memory_block *memory_to_allocate = (memory_block *) malloc(sizeof(memory_block));
     memory_to_allocate->vaddr = vaddr;
     memory_to_allocate->size = size;
     memory_to_allocate->flags = flags;
-    memory_to_allocate->o = o;
+    memory_to_allocate->object = object;
 
     return insert(map, memory_to_allocate);
 }

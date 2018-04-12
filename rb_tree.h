@@ -9,30 +9,30 @@
 
 #include <stdbool.h>
 
-typedef struct node Node;
-typedef struct tree map_t;
-typedef struct memory_block Memory_block;
+typedef struct node_t node_t;
+typedef struct map_t map_t;
+typedef struct memory_block memory_block;
 
-struct node {
+struct node_t {
     bool red;               // True if red
-    Node *left;
-    Node *right;
-    Node *parent;
-    Memory_block *memory;   // Info about memory block taken by this node
+    node_t *left;
+    node_t *right;
+    node_t *parent;
+    memory_block *memory;   // Info about memory block taken by this node_t
 };
 
-struct tree {
-    Node *root;
+struct map_t {
+    node_t *root;
 };
 
 struct memory_block {
     void *vaddr;
     unsigned int size;
     unsigned int flags;
-    void *o;
+    void *object;
 };
 
 int mymap_init(map_t *map);
-void *mymap_mmap(map_t *map, void *vaddr, unsigned int size, unsigned int flags, void *o);
+void *mymap_mmap(map_t *map, void *vaddr, unsigned int size, unsigned int flags, void *object);
 
 #endif //RED_BLACK_TREES_RB_TREE_H
