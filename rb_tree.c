@@ -28,10 +28,11 @@ int mymap_dump(map_t *map) {
     if (map->root == NULL) {
         printf("Empty map!");
     } else {
+        printf("Currently alocated blocks:\n");
         print_subtree(map->root);
     }
 
-    printf("\n");
+    printf("\n\n");
 
     return 0;
 }

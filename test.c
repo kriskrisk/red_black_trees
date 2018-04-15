@@ -6,27 +6,38 @@ int main() {
     map_t *map = malloc(sizeof(map_t));
     mymap_init(map);
 
-    int a;
-    int b;
+    printf("Just a short program to check is everything works:\n\n");
 
-    void *ptr1 = &a;
-    int object1 = 354;
-    mymap_mmap(map, ptr1, 3, 5, &object1);
+    int ptr1;
+    int ptr2;
 
-    void *ptr2 = &b;
-    int object2 = 354;
-    mymap_mmap(map, ptr2, 3, 5, &object2);
+    int object1 = 12;
+    int object2 = 34;
+    int object3 = 56;
+    int object4 = 78;
 
-    int object3 = 354;
-    mymap_mmap(map, ptr2 + 1, 3, 5, &object3);
+    void *ptr3 = mymap_mmap(map, &ptr1, 1, 2, &object1);
+    void *ptr4 = mymap_mmap(map, &ptr2, 3, 4, &object2);
+
+    mymap_dump(map);
+
+    void *ptr5 = mymap_mmap(map, &ptr2 + 1, 5, 6, &object3);
+    void *ptr6 = mymap_mmap(map, &ptr1, 7, 8, &object4);
 
     mymap_dump(map);
 
-    mymap_munmap(map, ptr1);
-    mymap_munmap(map, ptr2);
-    mymap_munmap(map, ptr2 + 4);
+    mymap_munmap(map, ptr3);
+    mymap_munmap(map, ptr4 + 1);
+    mymap_munmap(map, ptr5);
+    mymap_munmap(map, ptr6 + 10);
 
     mymap_dump(map);
+
+    mymap_munmap(map, ptr6);
+
+    mymap_dump(map);
+
+    free(map);
 
     return 0;
 }
