@@ -26,5 +26,7 @@ int main() {
     mymap_munmap(map, ptr2);
     mymap_munmap(map, ptr2 + 4);
 
+    mymap_dump(map);
+
     return 0;
 }

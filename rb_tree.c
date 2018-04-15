@@ -11,7 +11,7 @@ int mymap_init(map_t *map) {
     return 0;
 }
 
-void print_subtree(node_t *node) {
+static void print_subtree(node_t *node) {
     if (node->left != NULL) {
         print_subtree(node->left);
     }
@@ -31,6 +31,8 @@ int mymap_dump(map_t *map) {
         print_subtree(map->root);
     }
 
+    printf("\n");
+
     return 0;
 }
 
@@ -49,17 +51,17 @@ static bool is_left_child(node_t *node) {
     return node == node->parent->left;
 }
 
-// I assume that node_t has gradparent
-static node_t *uncle(node_t *node) {
-    if (is_left_child(node->parent)) {
-        return node->parent->parent->right;
-    }
-
-    return node->parent->parent->left;
-}
-
 static node_t *grandparent(node_t *node) {
     return node->parent->parent;
+}
+
+// I assume that node_t has a gradparent
+static node_t *uncle(node_t *node) {
+    if (is_left_child(node->parent)) {
+        return grandparent(node)->right;
+    }
+
+    return grandparent(node)->left;
 }
 
 static void rotate_left(node_t *node, map_t *map) {
@@ -100,7 +102,8 @@ static void rotate_right(node_t *node, map_t *map) {
 
 static void insert_case1(node_t *node, map_t *map);
 
-static void insert_case3(node_t *node, map_t *map) {
+// Case 2: when parent is red and uncle is black
+static void insert_case2(node_t *node, map_t *map) {
     if (is_left_child(node) && is_left_child(node->parent)) {
         rotate_right(grandparent(node), map);
         node->parent->red = false;
@@ -123,25 +126,22 @@ static void insert_case3(node_t *node, map_t *map) {
 
 }
 
-static void insert_case2(node_t *node, map_t *map) {
-    if (node->parent->red) {
-        if (uncle(node) != NULL && uncle(node)->red) {
-            node->parent->red = false;
-            uncle(node)->red = false;
-            grandparent(node)->red = true;
+static void insert_case1(node_t *node, map_t *map) {
+    if (node->parent == NULL) {
+        node->red = false;
+    } else {
+        if (node->parent->red) {
+            if (uncle(node) != NULL && uncle(node)->red) {
+                node->parent->red = false;
+                uncle(node)->red = false;
+                grandparent(node)->red = true;
 
-            insert_case1(grandparent(node), map);
-        } else {
-            insert_case3(node, map);         // Red parent and black uncle
+                insert_case1(grandparent(node), map);
+            } else {
+                insert_case2(node, map);         // Red parent and black uncle
+            }
         }
     }
-}
-
-static void insert_case1(node_t *node, map_t *map) {
-    if (node->parent == NULL)
-        node->red = false;
-    else
-        insert_case2(node, map);
 }
 
 static void *insert(map_t *map, memory_block *memory_to_allocate) {
@@ -169,8 +169,8 @@ static void *insert(map_t *map, memory_block *memory_to_allocate) {
         }
 
         new_node->parent = curr_considered;
-        // Rotations and switching colors
 
+        // Rotations and switching colors
         insert_case1(new_node, map);
     }
 
@@ -206,6 +206,7 @@ static bool is_leaf(node_t *node) {
     return node->left == NULL && node->right == NULL;
 }
 
+// Finds a node with minimal addresses on the right to put in place of deleted node
 static node_t *min_on_right(node_t *node) {
     node_t *max = node->right;
 
@@ -244,6 +245,7 @@ static node_t *find_node(map_t *map, void *vaddr) {
     return node;
 }
 
+// Returns color of a node, NULL is balck
 static bool is_red(node_t *node) {
     if (node == NULL) {
         return false;
